@@ -31,6 +31,8 @@ class DoHDNSHandler(BaseHTTPRequestHandler):
 						domain_name = dns_request.question[0].name.to_text()
 
 						resolver = dns.resolver.Resolver()
+						resolver.nameservers = ['8.8.8.8']
+						
 						dns_answer = resolver.resolve(dns_request.question[0].name, dns_request.question[0].rdtype)
 
 						response = dns.message.make_response(dns_request)
@@ -92,7 +94,7 @@ def run_server(server_class=HTTPServer, handler_class=DoHDNSHandler, port=443, c
 	context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 	context.load_cert_chain(certfile=cert_file, keyfile=key_file)
 
-	context.options |= ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1 
+	context.options |= ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1  # Disable old protocols
 	#context.verify_mode = ssl.CERT_NONE  # Do not verify client certificates
 
 	httpd.socket = context.wrap_socket(
